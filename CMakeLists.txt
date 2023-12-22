@@ -7,5 +7,5 @@ add_executable(emulateur_chip8
         main.c
         ram.c
         ram.h
-        prop.h
-        prop.c)
+        proc.h
+        proc.c)

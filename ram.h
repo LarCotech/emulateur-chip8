@@ -1,17 +1,13 @@
-//
-// Created by Carine RAFFIN-PEYLOZ on 22/12/2023.
-//
-
 #ifndef EMULATEUR_CHIP8_RAM_H
 #define EMULATEUR_CHIP8_RAM_H
 
 #include <stdint.h>
 #include <stddef.h>
 
-struct ram {
+typedef struct ram {
     uint8_t * first;
     size_t size;
-};
+} ram;
 
 struct ram * init();
 int destroy(struct ram *);
