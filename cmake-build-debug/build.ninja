@@ -61,8 +61,8 @@ build CMakeFiles/emulateur_chip8.dir/ram.c.o: C_COMPILER__emulateur_chip8_unscan
   OBJECT_DIR = CMakeFiles/emulateur_chip8.dir
   OBJECT_FILE_DIR = CMakeFiles/emulateur_chip8.dir
 
-build CMakeFiles/emulateur_chip8.dir/prop.c.o: C_COMPILER__emulateur_chip8_unscanned_Debug /Users/carineraffin-peyloz/Documents/emulateur-chip8/prop.c || cmake_object_order_depends_target_emulateur_chip8
-  DEP_FILE = CMakeFiles/emulateur_chip8.dir/prop.c.o.d
+build CMakeFiles/emulateur_chip8.dir/proc.c.o: C_COMPILER__emulateur_chip8_unscanned_Debug /Users/carineraffin-peyloz/Documents/emulateur-chip8/proc.c || cmake_object_order_depends_target_emulateur_chip8
+  DEP_FILE = CMakeFiles/emulateur_chip8.dir/proc.c.o.d
   FLAGS = -g -std=gnu11 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.4 -fcolor-diagnostics
   OBJECT_DIR = CMakeFiles/emulateur_chip8.dir
   OBJECT_FILE_DIR = CMakeFiles/emulateur_chip8.dir
@@ -75,7 +75,7 @@ build CMakeFiles/emulateur_chip8.dir/prop.c.o: C_COMPILER__emulateur_chip8_unsca
 #############################################
 # Link the executable emulateur_chip8
 
-build emulateur_chip8: C_EXECUTABLE_LINKER__emulateur_chip8_Debug CMakeFiles/emulateur_chip8.dir/main.c.o CMakeFiles/emulateur_chip8.dir/ram.c.o CMakeFiles/emulateur_chip8.dir/prop.c.o
+build emulateur_chip8: C_EXECUTABLE_LINKER__emulateur_chip8_Debug CMakeFiles/emulateur_chip8.dir/main.c.o CMakeFiles/emulateur_chip8.dir/ram.c.o CMakeFiles/emulateur_chip8.dir/proc.c.o
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -mmacosx-version-min=12.4
   OBJECT_DIR = CMakeFiles/emulateur_chip8.dir
   POST_BUILD = :

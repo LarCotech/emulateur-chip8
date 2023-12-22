@@ -9,10 +9,10 @@ typedef struct ram {
     size_t size;
 } ram;
 
-struct ram * init();
-int destroy(struct ram *);
-int read(struct ram *, int pos);
-int write(struct ram *, int pos, uint8_t weight);
+ram * init();
+int destroy(struct ram * RAM);
+uint8_t read(struct ram * RAM, int pos);
+int write(struct ram * RAM, unsigned int pos, uint8_t weight);
 
 
 #endif //EMULATEUR_CHIP8_RAM_H
