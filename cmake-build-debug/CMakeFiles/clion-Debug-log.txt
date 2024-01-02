@@ -1,4 +1,6 @@
-"/Users/carineraffin-peyloz/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/232.9921.42/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/carineraffin-peyloz/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/232.9921.42/CLion.app/Contents/bin/ninja/mac/ninja" -G Ninja -S /Users/carineraffin-peyloz/Documents/emulateur-chip8 -B /Users/carineraffin-peyloz/Documents/emulateur-chip8/cmake-build-debug
--- Configuring done (0.1s)
--- Generating done (0.0s)
--- Build files have been written to: /Users/carineraffin-peyloz/Documents/emulateur-chip8/cmake-build-debug
+"C:\Program Files\JetBrains\CLion 2022.3.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2022.3.1/bin/ninja/win/ninja.exe" -G Ninja -S C:\Users\Martin\OneDrive\Documents\GitHub\emulateur-chip8 -B C:\Users\Martin\OneDrive\Documents\GitHub\emulateur-chip8\cmake-build-debug
+CMake Error at CMakeLists.txt:1 (cmake_minimum_required):
+  CMake 3.26 or higher is required.  You are running version 3.24.2
+
+
+-- Configuring incomplete, errors occurred!
