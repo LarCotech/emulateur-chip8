@@ -6,6 +6,7 @@ int main () {
     printf("%zu ", RAM->size);
     *(RAM->first) = 1;
     printf("%u", *(RAM->first));
-    destroy(RAM);
+    //destroy(RAM);
     return 0;
+    //TEST
 }
