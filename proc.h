@@ -46,7 +46,12 @@ uint8_t decoderInstruction(uint16_t instruction, instructionsChip8 * instruction
 /*
  * prend une instruction chip-8 et execute l'action de l'insrtruction
  */
-void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions);
+void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions, cpu* cpu);
+
+/*
+ * A partir d'une instuction renvoi l'adresse correspondante a nnn (les 3 bits de poids faible) 
+ */
+uint8_t recupererNNN(uint8_t insteuction);
 
 #endif //EMULATEUR_CHIP8_PROC_H
 

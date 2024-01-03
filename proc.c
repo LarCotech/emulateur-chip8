@@ -100,39 +100,68 @@ uint8_t decoderInstruction(uint16_t instruction, instructionsChip8 * instruction
     return idInstruction;
 }
 
-void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions){
+uint8_t recupererNNN(uint8_t instruction){
+        uint8_t byte1, byte2, byte3;
+        byte3 = (instruction & (0x0F00)) >> 8;
+        byte2 = (instruction & (0x00F0)) >> 4;
+        byte1 = (instruction & (0x000F));
+        return byte3 + byte2 + byte1; 
+}
+
+void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions, cpu * cpu){
     //ici instruction est l'instruction a decoder et instructions est la structure qui contient les id et les masques de toutes les instructions
     uint8_t instructionDecodee = decoderInstruction(instruction, instructions);
     switch(instructionDecodee){
         case 0:
-            // Actions pour le cas 0
+            //Jump to a machine code routine at nnn.
+            //This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.
             break;
         case 1:
-            // Actions pour le cas 1
+            //Clear the display.
+
             break;
         case 2:
-            // Actions pour le cas 2
+            //Return from a subroutine.
+            //The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
+            cpu->pc = cpu->nbrstack;
+            if(cpu->nbrstack != 0){
+                 cpu->nbrstack --;
+            }
             break;
         case 3:
-            // Actions pour le cas 3
+            //Jump to location nnn.
+            //The interpreter sets the program counter to nnn.
+            cpu->pc = recupererNNN(instruction);
             break;
         case 4:
-            // Actions pour le cas 4
+            //Call subroutine at nnn.
+            //The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
+            if(cpu->nbrstack <= 15){
+                cpu->nbrstack ++;
+                cpu->stack[cpu->nbrstack] = cpu->pc;
+                cpu->pc = recupererNNN(instruction);
+            }
             break;
         case 5:
-            // Actions pour le cas 5
+            //Skip next instruction if Vx = kk.
+            //The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
             break;
         case 6:
-            // Actions pour le cas 6
+            //Skip next instruction if Vx != kk.
+            //The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2.
             break;
         case 7:
-            // Actions pour le cas 7
+            //Skip next instruction if Vx = Vy.
+            //The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
             break;
         case 8:
-            // Actions pour le cas 8
+            //Set Vx = kk.
+            //The interpreter puts the value kk into register Vx.
             break;
         case 9:
-            // Actions pour le cas 9
+            //Set Vx = Vx + kk.
+            //Adds the value kk to the value of register Vx, then stores the result in Vx.
+
             break;
         case 10:
             // Actions pour le cas 10
