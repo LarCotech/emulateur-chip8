@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 #include "ram.h"
+#include <stdint.h>
+#define NBINSTRUCTIONS 35
 
 typedef struct cpu {
     // RAM
@@ -17,8 +19,34 @@ typedef struct cpu {
     uint16_t pc; //pour parcourir le tableau « mémoire »
 } cpu;
 
+
+
 cpu* initrCpu();
 int decompter(cpu* CPU);
+
+/*
+ * Recupere deux cases adjacentes en memoire à partir du pc (compteur programme) et renvoi une instruction chip-8 codee sur 16 octets
+ */
+uint16_t recupererInstruction(cpu * CPU);
+
+typedef struct instructionsChip8{
+    uint16_t masque[NBINSTRUCTIONS];
+    uint16_t id[NBINSTRUCTIONS];
+}instructionsChip8;
+
+
+void initialiserInstructionsChip8(instructionsChip8 * instructions);
+
+/*
+ * Prend en parametre un instruction chip8 sur 16 bytes et retourne un uint8_t compris entre 0 et 35 
+ * qui correspond a l'id (de la structure instructionsChip8) de l'instruction passé en parametere. 
+ */
+uint8_t decoderInstruction(uint16_t instruction, instructionsChip8 * instructions);
+
+/*
+ * prend une instruction chip-8 et execute l'action de l'insrtruction
+ */
+void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions);
 
 #endif //EMULATEUR_CHIP8_PROC_H
 

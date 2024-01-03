@@ -9,11 +9,6 @@ typedef struct ram {
     size_t size;
 } ram;
 
-ram * init();
-int destroy(struct ram * RAM);
-uint8_t read(struct ram * RAM, int pos);
-int write(struct ram * RAM, unsigned int pos, uint8_t weight);
-
 ram * init() {
 
     //Allocation Memoire comme tableau d'élément uint8_t
