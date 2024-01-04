@@ -5,26 +5,21 @@
 
 
 cpu* initrCpu() {
-
     // Allocation structure cpu
     cpu* CPU = (cpu*) malloc(sizeof(cpu));
     // Init RAM
     CPU->RAM = init();
-
     // Registre d'adresse
     CPU->I = 0;
-
     // Registre V0 à VF et Stack (pile)
     for(unsigned int i = 0; i < 16; i++) {
         CPU->V[i] = 0;
         CPU->stack[i] = 0;
     }
-
     CPU->pc = 0x200;
     CPU->nbrstack = 0;
     CPU->timerDelay = 0;
     CPU->timerSound = 0;
-
     return CPU;
 }
 
@@ -105,22 +100,47 @@ uint8_t recupererNNN(uint8_t instruction){
         byte3 = (instruction & (0x0F00)) >> 8;
         byte2 = (instruction & (0x00F0)) >> 4;
         byte1 = (instruction & (0x000F));
-        return byte3 + byte2 + byte1; 
+        return (byte3<<8) + (byte2<<4) + byte1; 
+}
+
+uint8_t recupererkk(uint8_t instruction){
+    uint8_t byte1, byte2;
+    byte2 = (instruction & (0x00F0)) >> 4;
+    byte1 = (instruction & (0x000F));
+    return (byte2<<4) + byte1;
+}
+
+uint8_t recupererVx(uint8_t instruction){
+    uint8_t byte1;
+    byte1 = (instruction & (0x0F00)) >> 8;
+    return byte1;
+}
+
+uint8_t recupererVy(uint8_t instruction){
+    uint8_t byte1;
+    byte1 = (instruction & (0x0F0)) >> 4;
+    return byte1;
 }
 
 void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions, cpu * cpu){
     //ici instruction est l'instruction a decoder et instructions est la structure qui contient les id et les masques de toutes les instructions
+    uint16_t result;
+    uint8_t x, y, kk;
+    
     uint8_t instructionDecodee = decoderInstruction(instruction, instructions);
     switch(instructionDecodee){
         case 0:
+            //0nnn - SYS addr
             //Jump to a machine code routine at nnn.
             //This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.
             break;
         case 1:
+            //00E0 - CLS
             //Clear the display.
 
             break;
         case 2:
+            //00EE - RET
             //Return from a subroutine.
             //The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
             cpu->pc = cpu->nbrstack;
@@ -129,11 +149,13 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             }
             break;
         case 3:
+            //1nnn - JP addr
             //Jump to location nnn.
             //The interpreter sets the program counter to nnn.
             cpu->pc = recupererNNN(instruction);
             break;
         case 4:
+            //2nnn - CALL addr
             //Call subroutine at nnn.
             //The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
             if(cpu->nbrstack <= 15){
@@ -143,67 +165,173 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             }
             break;
         case 5:
+            //3xkk - SE Vx, byte            
             //Skip next instruction if Vx = kk.
             //The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
+            x = recupererVx(instruction);
+            if(cpu->V[x]== recupererkk(instruction)){
+                cpu->pc +=2;
+            }
             break;
         case 6:
+            //4xkk - SNE Vx, byte            
             //Skip next instruction if Vx != kk.
             //The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2.
+            x = recupererVx(instruction);
+            if(cpu->V[x] != recupererkk(instruction)){
+                cpu->pc +=2;
+            }
             break;
         case 7:
+            //5xy0 - SE Vx, Vy
             //Skip next instruction if Vx = Vy.
             //The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            if(cpu->V[x] == cpu->V[y]){
+                cpu->pc += 2;
+            }
             break;
         case 8:
             //Set Vx = kk.
             //The interpreter puts the value kk into register Vx.
+            x = recupererVx(instruction);
+            cpu->V[x] = recupererkk(instruction);
             break;
         case 9:
+            //6xkk - LD Vx, byte
             //Set Vx = Vx + kk.
             //Adds the value kk to the value of register Vx, then stores the result in Vx.
+            x = recupererVx(instruction);
+            cpu->V[x] += recupererkk(instruction);
 
             break;
         case 10:
-            // Actions pour le cas 10
+            //7xkk - ADD Vx, byte
+            //Set Vx = Vx + kk.
+            //Adds the value kk to the value of register Vx, then stores the result in Vx.
+            x = recupererVx(instruction);
+            cpu->V[x] += recupererkk(instruction);
             break;
         case 11:
-            // Actions pour le cas 11
+            //8xy0 - LD Vx, Vy
+            //Set Vx = Vy.
+            //Stores the value of register Vy in register Vx.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            cpu->V[x] = y;
             break;
         case 12:
-            // Actions pour le cas 12
+            //8xy1 - OR Vx, Vy
+            //Set Vx = Vx OR Vy.
+            //Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A bitwise OR compares the corrseponding bits 
+            //from two values, and if either bit is 1, then the same bit in the result is also 1. Otherwise, it is 0.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            cpu->V[x] = x | y; 
             break;
         case 13:
-            // Actions pour le cas 13
+            //8xy2 - AND Vx, Vy
+            //Set Vx = Vx AND Vy.
+            //Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx. 
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            cpu->V[x] = x & y; 
             break;
         case 14:
-            // Actions pour le cas 14
+            //8xy3 - XOR Vx, Vy
+            //Set Vx = Vx XOR Vy.
+            //Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result in Vx. 
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            cpu->V[x] = x ^ y; 
             break;
         case 15:
-            // Actions pour le cas 15
+            //8xy4 - ADD Vx, Vy
+            //Set Vx = Vx + Vy, set VF = carry.
+            //The values of Vx and Vy are added together. If the result is greater than 8 bits (i.e., > 255,) VF is set to 1,
+            //otherwise 0. Only the lowest 8 bits of the result are kept, and stored in Vx.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            //garde les 8 bits de oids faibles
+            result = cpu->V[x] + cpu->V[y];
+            if(result > 0xFF){
+                cpu->V[15] = 1;
+            } else cpu->V[15] = 0;
             break;
         case 16:
-            // Actions pour le cas 16
+            //8xy5 - SUB Vx, Vy
+            //Set Vx = Vx - Vy, set VF = NOT borrow.
+            //If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            if(cpu->V[x] > cpu->V[y]){
+                cpu->V[15] = 1;
+            }else cpu->V[15] = 0;
+             cpu->V[x] -=  cpu->V[y];
             break;
         case 17:
-            // Actions pour le cas 17
+            //8xy6 - SHR Vx {, Vy}
+            //Set Vx = Vx SHR 1.
+            //If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
+            x = recupererVx(instruction);
+            if((cpu->V[x] & (0x000F)) == 1){
+                 cpu->V[15] = 1;
+            }else  cpu->V[15] = 0;
+            cpu->V[x] /= 2;
             break;
         case 18:
-            // Actions pour le cas 18
+            //8xy7 - SUBN Vx, Vy
+            //Set Vx = Vy - Vx, set VF = NOT borrow.
+            //If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            if(cpu->V[y] > cpu->V[x]){
+                cpu->V[15] = 1;
+            }else cpu->V[15] = 0;
+            cpu->V[x] = cpu->V[y] - cpu->V[x];
             break;
         case 19:
-            // Actions pour le cas 19
+            //8xyE - SHL Vx {, Vy}
+            //Set Vx = Vx SHL 1.
+            //If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
+            x = recupererVx(instruction);
+            if(x & (0XF000) == 1){
+                cpu->V[15] = 1;
+            } else cpu->V[15] = 0; 
+            cpu->V[x] *= 2;
             break;
         case 20:
-            // Actions pour le cas 20
+            //9xy0 - SNE Vx, Vy
+            //Skip next instruction if Vx != Vy.
+            //The values of Vx and Vy are compared, and if they are not equal, the program counter is increased by 2.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            if(cpu->V[x] != cpu->V[y]){
+                cpu->pc += 2;
+            }
             break;
         case 21:
-            // Actions pour le cas 21
+            //Annn - LD I, addr
+            //Set I = nnn.
+            //The value of register I is set to nnn
+            cpu->I = recupererNNN(instruction);
             break;
         case 22:
-            // Actions pour le cas 22
+            // Bnnn - JP V0, addr
+            //Jump to location nnn + V0.
+            //The program counter is set to nnn plus the value of V0.
+            cpu->pc = recupererNNN(instruction) + cpu->V[0];
             break;
         case 23:
-            // Actions pour le cas 23
+            //Cxkk - RND Vx, byte
+            //Set Vx = random byte AND kk.
+            //The interpreter generates a random number from 0 to 255, which is then ANDed with the value kk. 
+            //The results are stored in Vx. See instruction 8xy2 for more information on AND.
+            x = recupererVx(instruction);
+            kk = recupererkk(instruction);
+            uint8_t random = rand() % 255;
+            cpu->V[x] = random & kk;
             break;
         case 24:
             // Actions pour le cas 24

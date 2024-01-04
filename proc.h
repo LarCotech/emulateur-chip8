@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "ram.h"
 #include <stdint.h>
+#include <stdlib.h>
 #define NBINSTRUCTIONS 35
 
 typedef struct cpu {
@@ -51,8 +52,22 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
 /*
  * A partir d'une instuction renvoi l'adresse correspondante a nnn (les 3 bits de poids faible) 
  */
-uint8_t recupererNNN(uint8_t insteuction);
+uint8_t recupererNNN(uint8_t instruction);
 
+/*
+ * retourne les 2 bits de poids faible de l'instruction 
+ */
+uint8_t recupererkk(uint8_t instruction);
+
+/*
+ * retourne le 2 eme byte de poid fort(0x0F00)
+ */
+uint8_t recupererVx(uint8_t instruction);
+
+/*
+ * retourne le 2 eme bit de poid faible (0x00F0)
+ */
+uint8_t recupererVy(uint8_t instruction);
 #endif //EMULATEUR_CHIP8_PROC_H
 
 
