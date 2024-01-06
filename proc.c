@@ -82,7 +82,7 @@ void initialiserInstructionsChip8(instructionsChip8 * instruction){
 
 
 uint8_t decoderInstruction(uint16_t instruction, instructionsChip8 * instructions){
-    uint8_t idInstruction;
+    uint8_t idInstruction = 0;
     for(int i = 0; i < NBINSTRUCTIONS; i++){
         //on applique à l'instruction passe en parametre tous les masques de notre structure instructionsChip8
         //si c'est egal a l'id d'une des nos instruction dans la structure alors c'est l'action de cette instruction qui est à effectuer.
@@ -296,7 +296,7 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             //Set Vx = Vx SHL 1.
             //If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2.
             x = recupererVx(instruction);
-            if(x & (0XF000) == 1){
+            if(((x & 0XF000) >> 4) == 1){
                 cpu->V[15] = 1;
             } else cpu->V[15] = 0; 
             cpu->V[x] *= 2;
@@ -370,4 +370,5 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             // Actions pour le cas par défaut
             break;
     }
+    cpu->pc += 2;
 }
