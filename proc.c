@@ -3,6 +3,11 @@
 #include "ram.h"
 #include "proc.h"
 
+/*
+ * Commande build / compile
+ * clang -std=c18 -Wall -pedantic test_sdl2.c -lSDL2
+ * clang -std=c18 -Wall -pedantic test_sdl2.c `pkg-config --libs sdl2`
+ * */
 
 cpu* initrCpu() {
     // Allocation structure cpu
@@ -125,7 +130,7 @@ uint8_t recupererVy(uint8_t instruction){
 void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instructions, cpu * cpu){
     //ici instruction est l'instruction a decoder et instructions est la structure qui contient les id et les masques de toutes les instructions
     uint16_t result;
-    uint8_t x, y, kk;
+    uint8_t x, y, kk, key;
     
     uint8_t instructionDecodee = decoderInstruction(instruction, instructions);
     switch(instructionDecodee){
@@ -298,7 +303,7 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             x = recupererVx(instruction);
             if(x & (0XF000) == 1){
                 cpu->V[15] = 1;
-            } else cpu->V[15] = 0; 
+            } else cpu->V[15] = 0;
             cpu->V[x] *= 2;
             break;
         case 20:
@@ -334,36 +339,99 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             cpu->V[x] = random & kk;
             break;
         case 24:
-            // Actions pour le cas 24
+            // Dxyn - DRW Vx, Vy, nibble
+            // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision.
+            // The interpreter reads n bytes from memory, starting at the address stored in I.
+            // These bytes are then displayed as sprites on screen at coordinates (Vx, Vy).
+            // Sprites are XORed onto the existing screen. If this causes any pixels to be erased,
+            // VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of
+            // it is outside the coordinates of the display, it wraps around to the opposite side of the screen.
+            // See instruction 8xy3 for more information on XOR, and section 2.4, Display,
+            // for more information on the Chip-8 screen and sprites.
+            x = recupererVx(instruction);
+            y = recupererVy(instruction);
+            // (Vx%63, Vy%31)
+
             break;
         case 25:
-            // Actions pour le cas 25
+            // Ex9E - SKP Vx
+            // Skip next instruction if key with the value of Vx is pressed.
+            // Checks the keyboard, and if the key corresponding to the value of Vx is currently
+            // in the down position, PC is increased by 2.
+            // Check keyboard
+            key = 0;
+            x = recupererVx(instruction);
+            if (Keyboard_get(cpu->keyboard, cpu->V[x]) == KEY_DOWN) cpu->pc += 2;
             break;
         case 26:
-            // Actions pour le cas 26
+            // ExA1 - SKNP Vx
+            // Skip next instruction if key with the value of Vx is not pressed.
+            // Checks the keyboard, and if the key corresponding to the value of Vx is
+            // currently in the up position, PC is increased by 2.
+            key = 0;
+            x = recupererVx(instruction);
+            if (Keyboard_get(cpu->keyboard, cpu->V[x]) == KEY_UP) cpu->pc += 2;
             break;
         case 27:
-            // Actions pour le cas 27
+            // Fx07 - LD Vx, DT
+            // Set Vx = delay timer value.
+            // The value of DT is placed into Vx.
+            x = recupererVx(instruction);
+            cpu->V[x] = cpu->timerDelay;
             break;
         case 28:
-            // Actions pour le cas 28
+            // Fx0A - LD Vx, K
+            // Wait for a key press, store the value of the key in Vx.
+            // All execution stops until a key is pressed, then the value of that key is stored in Vx.
+            x = recupererVx(instruction);
+            Keyboard_wait(cpu->keyboard, &cpu->V[x]);
             break;
         case 29:
-            // Actions pour le cas 29
+            // Fx15 - LD DT, Vx
+            // Set delay timer = Vx.
+            // DT is set equal to the value of Vx.
+            x = recupererVx(instruction);
+            cpu->timerDelay = cpu->V[x];
             break;
         case 30:
-            // Actions pour le cas 30
+            // Fx1E - ADD I, Vx
+            // Set I = I + Vx.
+            // The values of I and Vx are added, and the results are stored in I.
+            x = recupererVx(instruction);
+            cpu->I += cpu->V[x];
             break;
         case 31:
-            // Actions pour le cas 31
+            // Fx29 - LD F, Vx
+            // Set I = location of sprite for digit Vx.
+            // The value of I is set to the location for the hexadecimal sprite corresponding to the value of Vx.
+            // See section 2.4, Display, for more information on the Chip-8 hexadecimal font.
+
             break;
         case 32:
-            // Actions pour le cas 32
+            //Fx33
+            x = recupererVx(instruction);
+            result = cpu->V[x];
+            write(cpu->RAM, cpu->I + 2, result%10);
+            write(cpu->RAM, cpu->I + 1, (result/10)%10);
+            write(cpu->RAM, cpu->I, result/100);
             break;
         case 33:
-            // Actions pour le cas 33
+            // Fx55 - LD [I], Vx
+            // Store registers V0 through Vx in memory starting at location I.
+            // The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
+            x = recupererVx(instruction);
+            for (int i = 0; i <= x; i++) {
+                write(cpu->RAM, cpu->I+i, cpu->V[i]);
+            }
             break;
-        case 34: 
+        case 34:
+            // Fx65 - LD Vx, [I]
+            // Read registers V0 through Vx from memory starting at location I.
+            // The interpreter reads values from memory starting at location I into registers V0 through Vx.
+            x = recupererVx(instruction);
+            for (int i = 0; i <= x; i++) {
+                cpu->V[i] = read(cpu->RAM, cpu->I+1);
+            }
             break;
         default:
             // Cas par défaut (pour des valeurs non attendues)

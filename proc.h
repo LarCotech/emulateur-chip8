@@ -7,17 +7,29 @@
 #include <stdint.h>
 #include <stdlib.h>
 #define NBINSTRUCTIONS 35
+// A modifier
+#include "include//display/display.h"
+#include "include/keyboard/keyboard.h"
+#include "include/speaker/speaker.h"
 
 typedef struct cpu {
     // RAM
     ram* RAM;
-    uint8_t V[16]; //le registre
+    uint8_t V[16]; //les registres
     uint16_t I; //stocke une adresse mémoire ou dessinateur
     uint16_t stack[16]; //pour gérer les sauts dans « mémoire », 16 au maximum
     uint8_t nbrstack; //stocke le nombre de sauts effectués pour ne pas dépasser 16
     uint8_t timerDelay; //compteur pour la synchronisation
     uint8_t timerSound; //compteur pour le son
     uint16_t pc; //pour parcourir le tableau « mémoire »
+    // Libprovided
+    // Display & Sprite
+    struct Display* display;
+    struct Sprite* sprite;
+    // Keyboard
+    struct Keyboard* keyboard;
+    // Speaker
+    struct Speaker* speaker;
 } cpu;
 
 
