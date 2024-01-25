@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #define NBINSTRUCTIONS 35
 // A modifier
-#include "include//display/display.h"
+#include "include/display/display.h"
+#include "include/display/sprite.h"
 #include "include/keyboard/keyboard.h"
 #include "include/speaker/speaker.h"
 

@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include <stdlib.h>
-#include "ram.h"
 #include "proc.h"
 
 /*
@@ -25,6 +24,18 @@ cpu* initrCpu() {
     CPU->nbrstack = 0;
     CPU->timerDelay = 0;
     CPU->timerSound = 0;
+    // À Supp car dans structure machine (émulateur)
+    // Init SLD elt
+    // Display & Sprite
+    struct Display* display;
+
+    Display_init(CPU->display, 8);
+    struct Sprite* sprite;
+    // Keyboard
+    struct Keyboard* keyboard;
+    // Speaker
+    struct Speaker* speaker;
+
     return CPU;
 }
 
@@ -350,7 +361,11 @@ void effectuerActionInstruction(uint8_t instruction, instructionsChip8 * instruc
             // for more information on the Chip-8 screen and sprites.
             x = recupererVx(instruction);
             y = recupererVy(instruction);
-            // (Vx%63, Vy%31)
+            /*
+            for (int pos = cpu->I; pos < cpu->RAM->size; pos++) {
+
+            }*/
+            Display_DRW(cpu->display, cpu->sprite, cpu->V[x], cpu->V[y], &cpu->V[15]);
 
             break;
         case 25:
