@@ -1,2 +1,7 @@
 # ninja log v5
 160	337	1703260280250336296	emulateur_chip8	c2b88fcce9a15831
+11	160	7272680643844971	CMakeFiles/emulateur_chip8.dir/ram.c.obj	fcc83b21e7c28a72
+1	757	7272680649827408	CMakeFiles/emulateur_chip8.dir/main.c.obj	330778544661feb
+22	800	7272680650245035	CMakeFiles/emulateur_chip8.dir/testSDL.c.obj	8de87afe14ad510d
+5	667	7272681196522679	CMakeFiles/emulateur_chip8.dir/main.c.obj	330778544661feb
+668	791	7272681197709183	emulateur_chip8.exe	a17729e3788215e5
